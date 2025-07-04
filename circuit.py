@@ -19,7 +19,9 @@ def compute(encrypted_datasets: List[bytes], public_crypto_context: bytes) -> by
         encrypted_result += vec
 
     # Homomorphic division by constant
-    encrypted_result /= num_alleles
+    # Use multiplication by inverse since direct division is not supported
+    inverse = 1.0 / num_alleles
+    encrypted_result *= inverse
 
     # Serialize the result for return
     return encrypted_result.serialize()
