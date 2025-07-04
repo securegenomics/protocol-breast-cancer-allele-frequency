@@ -12,7 +12,6 @@ def decrypt_result(encrypted_result: bytes, private_crypto_context: bytes) -> Di
 def interpret_result(result):
     # remove the extra one at the end to count the number of alleles
     result, num_alleles = result[:-1], result[-1]
-    result = result / num_alleles
     print('Allele frequencies:', result)
     return {
         'allele_frequencies': result,
