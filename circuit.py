@@ -5,8 +5,15 @@ import tenseal as ts
 
 def compute(encrypted_datasets: List[bytes]) -> bytes:
     # multiplication depth: 1
-    vectors = [ts.bfv_vector_from(context=None, data=_) for _ in encrypted_datasets]
+    vectors = []
+    for data in encrypted_datasets:
+        # Deserialize bytes directly into a vector
+        vector = ts.bfv_vector_load(data)
+        vectors.append(vector)
     
+    if not vectors:
+        raise ValueError("No encrypted datasets provided")
+        
     num_alleles = len(vectors) * 2
     
     # sum vectors and divide by num_alleles
