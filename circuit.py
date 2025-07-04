@@ -5,7 +5,7 @@ import tenseal as ts
 
 def compute(encrypted_datasets: List[bytes]) -> bytes:
     # multiplication depth: 1
-    vectors = [ts.bfv_vector.deserialize(_) for _ in encrypted_datasets]
+    vectors = [ts.bfv_vector_from(context=None, data=_) for _ in encrypted_datasets]
     
     num_alleles = len(vectors) * 2
     
@@ -13,4 +13,3 @@ def compute(encrypted_datasets: List[bytes]) -> bytes:
     encrypted_result = sum(vectors) / num_alleles
     
     return encrypted_result.serialize()
-   
