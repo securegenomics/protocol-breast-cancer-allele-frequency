@@ -1,22 +1,25 @@
 """FHE Computation Circuit for SecureGenomics Protocol."""
 
-from typing import Dict, Any, List
+from typing import List
 import tenseal as ts
 
-def compute(encrypted_datasets: List[bytes]) -> bytes:
-    # multiplication depth: 1
-    vectors = []
-    for data in encrypted_datasets:
-        # Deserialize bytes directly into a vector
-        vector = ts.bfv_vector_load(data)
-        vectors.append(vector)
+def compute(encrypted_datasets: List[bytes], public_crypto_context: bytes) -> bytes:
+    # Deserialize the public context
+    context = ts.context_from(public_crypto_context)
     
-    if not vectors:
-        raise ValueError("No encrypted datasets provided")
-        
+    # Deserialize all encrypted vectors using the context
+    vectors = [ts.bfv_vector_from(context=context, data=data) for data in encrypted_datasets]
+    
+    # multiplication depth: 1
     num_alleles = len(vectors) * 2
     
-    # sum vectors and divide by num_alleles
-    encrypted_result = sum(vectors) / num_alleles
-    
+    # Homomorphic sum
+    encrypted_result = vectors[0]
+    for vec in vectors[1:]:
+        encrypted_result += vec
+
+    # Homomorphic division by constant
+    encrypted_result /= num_alleles
+
+    # Serialize the result for return
     return encrypted_result.serialize()
